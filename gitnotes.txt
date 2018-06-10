@@ -1,6 +1,18 @@
 This file is to record git notes for moving around git. 
 
 
+To ADD a file to local repository:
+git add gitnotes.txt
+
+Check status:
+git status
+
+COMMIT Added file from above (no need to mention name because the 'add' puts teh file in the staging folder)
+Note that the -m is for including a message:
+git commit -m 'add git notes to repository'
+
+
 The initial push was done w/ the following commands:
 git remote add origin https://github.com/floppydisk525/blinkio.git
 git push -u origin master
+
