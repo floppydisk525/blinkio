@@ -1,0 +1,6 @@
+This file is to record git notes for moving around git. 
+
+
+The initial push was done w/ the following commands:
+git remote add origin https://github.com/floppydisk525/blinkio.git
+git push -u origin master
