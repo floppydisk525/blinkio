@@ -1,6 +1,5 @@
 This file is to record git notes for moving around git. 
 
-
 To ADD a file to local repository:
 git add gitnotes.txt
 
@@ -16,3 +15,14 @@ The initial push was done w/ the following commands:
 git remote add origin https://github.com/floppydisk525/blinkio.git
 git push -u origin master
 
+
+
+COMPILE C CODE EXAMPLE
+cd examples/blink
+gcc -o blink -l rt blink.c -l bcm2835 
+
+And then run the blink exe with this command:
+sudo ./blink
+If you connect the positive pin of a 5V LED to pin 11 of the P1 header it should be blinking. 
+
+Use CTRL+Break or CTRL+SHIFT+C to stop the exe.
