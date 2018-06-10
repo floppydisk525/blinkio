@@ -69,7 +69,7 @@ int main(int argc, char **argv)
         //printf("read from gpio 4: %d\n", value);
         bcm2835_gpio_write(OUT_GPIO6, value);
 
-        Heartbeat();       //call heartbeat function 
+        HeartBeat();       //call heartbeat function 
 
         // wait a bit
         delay(10);
