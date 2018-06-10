@@ -21,7 +21,27 @@
 #define OUT_GPIO5 RPI_V2_GPIO_P1_29
 #define OUT_GPIO6 RPI_V2_GPIO_P1_31
 
+//define variable
+int hb_state_1s = 0;    //heartBeat IO
+long int last_heartbeat;
+long int heartbeat_difference = 1000000000;
+struct timespec getting_now;
 
+//--------------------------
+//----- HEARTBEAT TIME -----
+//--------------------------
+void HeartBeat()
+{
+   clock_gettime(CLOCK_REALTIME, &gettime_now);
+   heartbeat_difference = gettime_now.tv_nsec - last_heartbeat;
+
+   if (heartbeat_difference < 0)
+   {
+     heartbeat_difference += 1000000000;     //(Rolls over every 1 second)
+     hb_state_1s ^= 1;                        //toggle the pin state
+     bcm2835_gpio_write(OUT_GPIO5, hb_state_1s)
+   }
+}
 
 
 int main(int argc, char **argv)
@@ -36,18 +56,28 @@ int main(int argc, char **argv)
     bcm2835_gpio_fsel(IN_GPIO4, BCM2835_GPIO_FSEL_INPT);
     //  with a pullup
     // bcm2835_gpio_set_pud(PIN, BCM2835_GPIO_PUD_UP);
-	bcm2835_gpio_fsel(OUT_GPIO5, BCM2835_GPIO_FSEL_OUTP);
-	bcm2835_gpio_fsel(OUT_GPIO6, BCM2835_GPIO_FSEL_OUTP);
+    bcm2835_gpio_fsel(OUT_GPIO5, BCM2835_GPIO_FSEL_OUTP);
+    bcm2835_gpio_fsel(OUT_GPIO6, BCM2835_GPIO_FSEL_OUTP);
 
+    //-----------------------------------------------------------
+    //-------------------  infinite while loop ------------------
+    //-----------------------------------------------------------
     while (1)
     {
         // Read some data
         uint8_t value = bcm2835_gpio_lev(IN_GPIO4);
-        printf("read from gpio 4: %d\n", value);
+        //printf("read from gpio 4: %d\n", value);
+        bcm2835_gpio_write(OUT_GPIO6, value);
+
+        Heartbeat();       //call heartbeat function 
 
         // wait a bit
-        delay(500);
+        delay(10);
     }
+
+   //-----------------------------------------------------------
+   //------------------  END OF INFITIE LOOP  ------------------
+   //-----------------------------------------------------------
 
     bcm2835_close();
     return 0;
