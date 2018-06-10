@@ -10,10 +10,22 @@ COMMIT Added file from above (no need to mention name because the 'add' puts teh
 Note that the -m is for including a message:
 git commit -m 'add git notes to repository'
 
+----------------------------- BRANCHING ----------------------
+create a branch
 
+
+------------------------------  PUSH  -------------------------
 The initial push was done w/ the following commands:
 git remote add origin https://github.com/floppydisk525/blinkio.git
 git push -u origin master
+
+push a branch named blinktime
+git push origin blinktime 
+
+push the master
+git push origin master
+
+NOTE:  origin is the github 'online' remote repository.  
 
 
 
