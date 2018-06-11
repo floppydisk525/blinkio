@@ -30,17 +30,19 @@ struct timespec gettime_now;
 //----- HEARTBEAT TIME -----
 //--------------------------
 //The gettime_now.tv_nsec counts in nanoseconds from 0 to 1 second (1 billion cts)
-//  The way this works is that when the nano seconds get above 10000, the 
-//  CheckTime variable is set to 1 and the next if statement will then check 
+//  The way this works is that when the nano seconds get above 10000, the
+//  CheckTime variable is set to 1 and the next if statement will then check
 //  if the nanocounter has started back at 1.  Once it has, then it will
 //  reset the CheckTime variable to 0 (don't check) and toggle the GPIO output.
 void HeartBeat()
 {
    clock_gettime(CLOCK_REALTIME, &gettime_now);
+//   printf("gettime_now: %ld\n",gettime_now.tv_nsec);
 
-   if(gettime_now.tv_nsec > 10000)
-      CheckTime = 1; 
-   if (CheckTime == 1 && gettime_now.tv_nsec <10000)
+   if(gettime_now.tv_nsec > 500000000)
+     CheckTime = 1;
+
+   if (CheckTime == 1 && gettime_now.tv_nsec <500000000)
    {
      CheckTime = 0;                           //set checktime false
      hb_state_1s ^= 1;                        //toggle the pin state
@@ -49,8 +51,8 @@ void HeartBeat()
 }
 
 //*****************************************************
-//********** DELAY FOR # uS WITHOUT SLEEPING **********
-//**************** SEND ANY TIME AMT  ****************
+//******** DELAY FOR MicroSec WITHOUT SLEEPING ********
+//**************** SEND ANY TIME AMT  *****************
 //Using delayMicroseconds lets the linux scheduler decide to jump to another process.  Using this function avoids letting the
 //scheduler know we are pausing and provides much faster operation if you are needing to use lots of delays.
 void DelayMicrosecondsNoSleep (int delay_us)
@@ -73,7 +75,7 @@ void DelayMicrosecondsNoSleep (int delay_us)
 }
 
 //-----------------------------------------------------------
-//------------------------  main  ---------------------------
+//------------------------  MAIN  ---------------------------
 //-----------------------------------------------------------
 
 int main(int argc, char **argv)
@@ -101,7 +103,7 @@ int main(int argc, char **argv)
         //printf("read from gpio 4: %d\n", value);
         bcm2835_gpio_write(OUT_GPIO6, value);
 
-        HeartBeat();       //call heartbeat function 
+        HeartBeat();       //call heartbeat function
 
         // wait a bit (which is better below?
         delay(10);      //time in ms
@@ -110,7 +112,6 @@ int main(int argc, char **argv)
 
    //-----------------------------------------------------------
    //------------------  END OF INFITIE LOOP  ------------------
-   //-----------------------------------------------------------
 
     bcm2835_close();
     return 0;
