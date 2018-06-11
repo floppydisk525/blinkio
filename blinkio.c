@@ -25,7 +25,7 @@
 int hb_state_1s = 0;    //heartBeat IO
 long int last_heartbeat;
 long int heartbeat_difference = 1000000000;
-struct timespec getting_now;
+struct timespec gettime_now;
 
 //--------------------------
 //----- HEARTBEAT TIME -----
@@ -39,10 +39,37 @@ void HeartBeat()
    {
      heartbeat_difference += 1000000000;     //(Rolls over every 1 second)
      hb_state_1s ^= 1;                        //toggle the pin state
-     bcm2835_gpio_write(OUT_GPIO5, hb_state_1s)
+     bcm2835_gpio_write(OUT_GPIO5, hb_state_1s);
    }
 }
 
+//*****************************************************
+//********** DELAY FOR # uS WITHOUT SLEEPING **********
+//*****************************************************
+//Using delayMicroseconds lets the linux scheduler decide to jump to another process.  Using this function avoids letting the
+//scheduler know we are pausing and provides much faster operation if you are needing to use lots of delays.
+void DelayMicrosecondsNoSleep (int delay_us)
+{
+	long int dm_start_time;
+	long int dm_time_difference;
+	struct timespec dm_gettime_now;
+
+	clock_gettime(CLOCK_REALTIME, &dm_gettime_now);
+	dm_start_time = dm_gettime_now.tv_nsec;		//Get nS value
+	while (1)
+	{
+		clock_gettime(CLOCK_REALTIME, &dm_gettime_now);
+		dm_time_difference = dm_gettime_now.tv_nsec - dm_start_time;
+		if (dm_time_difference < 0)
+			dm_time_difference += 1000000000;				//(Rolls over every 1 second)
+		if (dm_time_difference > (delay_us * 1000))		//Delay for # nS
+			break;
+	}
+}
+
+//-----------------------------------------------------------
+//------------------------  main  ---------------------------
+//-----------------------------------------------------------
 
 int main(int argc, char **argv)
 {
@@ -71,8 +98,9 @@ int main(int argc, char **argv)
 
         HeartBeat();       //call heartbeat function 
 
-        // wait a bit
-        delay(10);
+        // wait a bit (which is better below?
+        delay(10);      //time in ms
+        DelayMicrosecondsNoSleep(10);     //time in msecs
     }
 
    //-----------------------------------------------------------
