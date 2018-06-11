@@ -23,21 +23,26 @@
 
 //define variable
 int hb_state_1s = 0;    //heartBeat IO
-long int last_heartbeat;
-long int heartbeat_difference = 1000000000;
+int CheckTime = 0;      //boolean (int) to allow time check.
 struct timespec gettime_now;
 
 //--------------------------
 //----- HEARTBEAT TIME -----
 //--------------------------
+//The gettime_now.tv_nsec counts in nanoseconds from 0 to 1 second (1 billion cts)
+//  The way this works is that when the nano seconds get above 10000, the 
+//  CheckTime variable is set to 1 and the next if statement will then check 
+//  if the nanocounter has started back at 1.  Once it has, then it will
+//  reset the CheckTime variable to 0 (don't check) and toggle the GPIO output.
 void HeartBeat()
 {
    clock_gettime(CLOCK_REALTIME, &gettime_now);
-   heartbeat_difference = gettime_now.tv_nsec - last_heartbeat;
 
-   if (heartbeat_difference < 0)
+   if(gettime_now.tv_nsec > 10000)
+      CheckTime = 1; 
+   if (CheckTime == 1 && gettime_now.tv_nsec <10000)
    {
-     heartbeat_difference += 1000000000;     //(Rolls over every 1 second)
+     CheckTime = 0;                           //set checktime false
      hb_state_1s ^= 1;                        //toggle the pin state
      bcm2835_gpio_write(OUT_GPIO5, hb_state_1s);
    }
@@ -45,7 +50,7 @@ void HeartBeat()
 
 //*****************************************************
 //********** DELAY FOR # uS WITHOUT SLEEPING **********
-//*****************************************************
+//**************** SEND ANY TIME AMT  ****************
 //Using delayMicroseconds lets the linux scheduler decide to jump to another process.  Using this function avoids letting the
 //scheduler know we are pausing and provides much faster operation if you are needing to use lots of delays.
 void DelayMicrosecondsNoSleep (int delay_us)
@@ -100,7 +105,7 @@ int main(int argc, char **argv)
 
         // wait a bit (which is better below?
         delay(10);      //time in ms
-        DelayMicrosecondsNoSleep(10);     //time in msecs
+//        DelayMicrosecondsNoSleep(10);     //time in msecs
     }
 
    //-----------------------------------------------------------
