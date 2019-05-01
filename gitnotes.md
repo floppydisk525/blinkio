@@ -43,7 +43,7 @@ NOTE:  origin is the github 'online' remote repository.
 git log --oneline --decorate  
 
 ----------------- [GIT CHANGES FROM MASTER TO BRANCH](https://stackoverflow.com/questions/5340724/get-changes-from-master-into-branch-in-git) -----------  
-git checkout '<branch>'
+git checkout &ltbranch>&gt
 git merge origin/master
 
 ------------------------- CLONE A REPOSITORY ------------------  
